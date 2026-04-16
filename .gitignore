@@ -1,0 +1,101 @@
+# --- Gradle ---
+.gradle/
+build/
+**/build/
+out/
+!gradle/wrapper/gradle-wrapper.jar
+
+# --- Android ---
+*.apk
+*.aab
+*.ap_
+*.dex
+*.class
+local.properties
+captures/
+.externalNativeBuild/
+.cxx/
+proguard/
+release/
+
+# Generated R / BuildConfig
+gen/
+generated/
+
+# --- Kotlin ---
+.kotlin/
+*.kotlin_module
+
+# --- IntelliJ / Android Studio ---
+*.iml
+.idea/
+!.idea/codeStyles/
+!.idea/icon.png
+.idea/caches/
+.idea/libraries/
+.idea/modules.xml
+.idea/workspace.xml
+.idea/navEditor.xml
+.idea/assetWizardSettings.xml
+.idea/misc.xml
+.idea/*.xml
+.idea/deploymentTargetDropDown.xml
+.idea/deploymentTargetSelector.xml
+.idea/jarRepositories.xml
+.idea/runConfigurations.xml
+
+# --- VS Code ---
+.vscode/
+
+# --- Claude Code (workspace state, not portable) ---
+.claude/
+
+# --- Java ---
+*.jar
+!gradle/wrapper/gradle-wrapper.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+hs_err_pid*
+replay_pid*
+
+# --- OS junk ---
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# --- Logs ---
+*.log
+logs/
+
+# --- Secrets / env ---
+# Anthropic API keys and MCP bearer tokens live in EncryptedSharedPreferences
+# at runtime, but never commit anything that looks like a credential.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.keystore
+*.jks
+keystore.properties
+google-services.json
+service-account.json
+
+# --- Coverage / test reports ---
+*.exec
+coverage/
+jacoco/
+test-output/
+
+# --- Misc ---
+*.bak
+*.swp
+*~
+.history/

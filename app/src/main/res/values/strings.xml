@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">A11yPilot</string>
+    <string name="accessibility_service_description">Lets A11yPilot read the screen and dispatch taps, text, and gestures so the AI agent can drive the phone on your behalf.</string>
+    <string name="accessibility_service_summary">A11yPilot \u2014 AI phone agent</string>
+</resources>
