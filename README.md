@@ -108,42 +108,59 @@ The same tool dispatcher is also exposed as an HTTP server speaking JSON-RPC 2.0
 
 ## How it works
 
+A11yPilot is an **agentic loop**: an LLM looks at the screen, picks one tool, the tool runs, the new screen is fed back, repeat until the LLM calls `done`. The LLM can be either Claude running in-app via the Anthropic API, **or** any external LLM connected through the MCP server. Both paths land on the same `ToolExecutor`, so behavior is identical.
+
 ```
-                                 ┌────────────────────────────┐
-   Voice / typed instruction ──► │        AgentEngine         │
-                                 │  (StateFlow + run loop)    │
-                                 └──────────────┬─────────────┘
-                                                │
-                                                ▼
-                                 ┌────────────────────────────┐
-                                 │       AnthropicClient      │
-                                 │  /v1/messages + caching    │
-                                 └──────────────┬─────────────┘
-                                                │  tool_use
-                                                ▼
-                                 ┌────────────────────────────┐         ┌────────────────────────┐
-                                 │        ToolExecutor        │ ◄────── │  JsonRpc (MCP server)  │
-                                 │  (single source of truth)  │         │  POST /mcp             │
-                                 └──────────────┬─────────────┘         └────────────────────────┘
-                                                │
-                                                ▼
-                                 ┌────────────────────────────┐
-                                 │ PilotAccessibilityService   │
-                                 │ rootInActiveWindow,        │
-                                 │ performAction,             │
-                                 │ dispatchGesture,           │
-                                 │ takeScreenshot             │
-                                 └────────────────────────────┘
+                          ┌─────────────────────────────────────────────────┐
+                          │                    LLM brain                    │
+                          │                                                 │
+   voice / typed ───────► │  ┌─────────────────┐    ┌──────────────────┐    │ ◄──── HTTP + Bearer
+   prompt (in-app run)    │  │  Anthropic API  │    │   MCP client     │    │       over LAN:
+                          │  │  Claude Sonnet  │ OR │   over HTTP /    │    │       Claude Code,
+                          │  │  / Opus / Haiku │    │   JSON-RPC 2.0   │    │       Claude Desktop,
+                          │  │  + prompt cache │    │   + Bearer auth  │    │       curl, anything
+                          │  └─────────────────┘    └──────────────────┘    │       that speaks MCP
+                          └────────────────────────┬────────────────────────┘
+                                                   │  picks ONE next tool call
+                                                   ▼
+                          ┌─────────────────────────────────────────────────┐
+                          │       ToolExecutor   (single dispatcher)        │
+                          │                                                 │
+                          │   click • set_text • scroll • tap • swipe       │
+                          │   screenshot • launch_app • global • wait       │
+                          │   dump_screen • done                            │
+                          └────────────────────────┬────────────────────────┘
+                                                   │
+                                                   ▼
+                          ┌─────────────────────────────────────────────────┐
+                          │           PilotAccessibilityService             │
+                          │                                                 │
+                          │   • reads view tree → ScreenSerializer → DSL    │
+                          │   • performAction · dispatchGesture · setText   │
+                          │   • takeScreenshot (vision fallback, opt-in)    │
+                          └────────────────────────┬────────────────────────┘
+                                                   │
+                                                   ▼
+                            Android view tree of whichever app is in front
+                                                   │
+                                                   └─── new screen + screenshot
+                                                        ◄───── fed back to the LLM
+                                                              as the tool result,
+                                                              loop continues until
+                                                              the LLM calls `done`
 ```
 
-Key design choices:
+Why this shape matters:
 
-- **One tool dispatcher, two callers.** Both `AgentEngine` and the MCP `JsonRpc` route through `ToolExecutor`. Behavior is identical regardless of who initiated the call. Bug fix in one place fixes both surfaces.
-- **Compact screen DSL.** `ScreenSerializer` filters `rootInActiveWindow` to visible + actionable + has-text nodes, collapses single-child wrappers, and emits one line per element: `[id] ShortClass "text" ?hint *!…`. Indentation = parent/child. Typical screen serializes to a few hundred tokens, not thousands.
-- **IDs are turn-scoped.** Each `dump_screen` (or any action) returns fresh ids. The model is told ids are valid only for the current turn, which lets the executor build a compact `idMap` without persistent state.
-- **Settle wait, not sleep.** After every action, `PilotAccessibilityService.awaitSettle()` waits until no `AccessibilityEvent` has fired for 250 ms (capped at 1.5 s). Faster than fixed sleeps and more reliable than polling.
-- **Screenshots are opt-in.** The `screenshot` tool is documented as expensive in the system prompt, so the model only calls it when the tree is genuinely insufficient.
-- **MCP runs in a foreground service.** Ktor CIO bound to `0.0.0.0:<port>`, sticky notification, survives screen-off. Bearer token generated on first enable and stored encrypted.
+- **The LLM is the planner; the phone is the actuator.** A11yPilot does no planning. Every decision — which button to tap, when to scroll, when to give up — is the model's. That's what makes a fuzzy instruction like *"book me a 9 a.m. cab tomorrow"* work without any per-app scripting.
+- **Bring-your-own LLM via MCP.** The in-app loop uses the Anthropic API directly because that's what's optimized for tool-use and prompt caching today, but the MCP surface is model-agnostic — anything that speaks the MCP spec can drive the phone. Connect it to Claude Code, Claude Desktop, or your own agent harness using OpenAI/Gemini/local models behind an MCP-compatible client.
+- **One tool dispatcher, two callers.** Both `AgentEngine` (in-app) and `JsonRpc` (MCP) route through `ToolExecutor`. A bug fix or new tool in one place is automatically available to the other.
+- **Compact screen DSL beats raw screenshots.** `ScreenSerializer` filters `rootInActiveWindow` to visible + actionable + has-text nodes, collapses single-child wrappers, and emits one line per element: `[id] ShortClass "text" ?hint *!…`. Typical screen serializes to a few hundred tokens vs the ~thousands a vision-only approach burns per turn — and it works on most apps without a screenshot at all.
+- **IDs are turn-scoped.** Each tool result returns fresh ids. The model is told ids are valid only for the current turn, so the executor builds a compact `idMap` per call with no persistent state.
+- **Prompt caching pays off fast.** System prompt + tool schemas are marked `cache_control: ephemeral`. After turn 1, per-turn input cost drops sharply — visible in the per-turn token breakdown the UI shows after each run.
+- **Settle wait, not sleep.** After every action, `awaitSettle()` waits until no `AccessibilityEvent` has fired for 250 ms (capped at 1.5 s). Faster than fixed sleeps, more reliable than polling.
+- **Screenshots are opt-in vision.** The `screenshot` tool is explicitly documented as expensive in the system prompt, so the LLM only reaches for it on canvas UIs, games, video, or when it needs to verify a visual state.
+- **MCP runs in a foreground service.** Ktor CIO bound to `0.0.0.0:<port>`, sticky notification, survives screen-off. Bearer token generated on first enable, stored in `EncryptedSharedPreferences`, never logged.
 
 ---
 
@@ -389,32 +406,6 @@ Contributions are very welcome — issues, PRs, and design discussion all useful
 3. Match the existing code style — Kotlin official, 4-space indent, no wildcard imports.
 4. New tools added to `ToolExecutor` must also have a schema entry in `Prompts.anthropicTools()` and a dispatch case in both `AgentEngine.dispatch` and `JsonRpc.toolsCall` — this keeps in-app and MCP behavior aligned.
 5. Don't bloat the system prompt without measuring the token impact.
-
-**Repo layout:**
-
-```
-app/src/main/java/com/azizahmed45/a11ypilot/
-├── PilotAccessibilityService.kt   the accessibility service (singleton via INSTANCE)
-├── EventLog.kt                    in-app log singleton
-├── MainActivity.kt                Compose UI
-├── OverlayController.kt           older debug overlay
-├── ServiceState.kt                accessibility-enabled flag
-├── agent/
-│   ├── AgentEngine.kt             run loop + state
-│   ├── AgentOverlay.kt            floating progress overlay with Stop button
-│   ├── AgentSettings.kt           DataStore + EncryptedSharedPreferences
-│   ├── AnthropicClient.kt         /v1/messages client with caching
-│   ├── NetUtil.kt                 active Wi-Fi IPv4 helper
-│   ├── Prompts.kt                 system prompt + tool schemas
-│   ├── ScreenSerializer.kt        accessibility tree → DSL
-│   ├── SpeechInput.kt             push-to-talk wrapper
-│   └── ToolExecutor.kt            single tool dispatcher
-├── mcp/
-│   ├── JsonRpc.kt                 MCP method routing
-│   ├── McpServer.kt               Ktor CIO server
-│   └── McpService.kt              foreground service
-└── ui/theme/                       Compose theme
-```
 
 **Good first issues:** anything tagged `help wanted` in GitHub issues, or pick from the Roadmap.
 
