@@ -97,7 +97,7 @@ class OpenAIClient(
                     add(buildJsonObject {
                         put("role", "user")
                         if (toolResults.isNotEmpty()) {
-                            put("content", buildJsonArray {
+                            val allText = buildString {
                                 for (tr in toolResults) {
                                     val content = tr["content"]
                                     val text = when {
@@ -108,12 +108,13 @@ class OpenAIClient(
                                         }
                                         else -> content.jsonPrimitive.contentOrNull ?: ""
                                     }
-                                    add(buildJsonObject {
-                                        put("type", "text")
-                                        put("content", text)
-                                    })
+                                    if (text.isNotBlank()) {
+                                        if (isNotEmpty()) append("\n")
+                                        append(text)
+                                    }
                                 }
-                            })
+                            }
+                            put("content", allText)
                         } else {
                             put("content", textBlocks.joinToString("\n") {
                                 it["text"]?.jsonPrimitive?.content ?: ""

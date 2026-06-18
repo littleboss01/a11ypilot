@@ -215,7 +215,7 @@ private fun MainScreen(
         )
 
         TryThisCard(
-            enabled = enabled && apiKeySet && agentState !is AgentEngine.State.Running,
+            enabled = apiKeySet && agentState !is AgentEngine.State.Running,
             onPick = { instruction = it }
         )
 
@@ -387,7 +387,7 @@ private fun AgentCard(
     var listening by remember { mutableStateOf(false) }
     var partial by remember { mutableStateOf("") }
     val running = state is AgentEngine.State.Running
-    val canRun = enabled && apiKeySet && !running
+    val canRun = apiKeySet && !running
 
     val startListening: () -> Unit = {
         listening = true
