@@ -72,6 +72,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -118,10 +119,10 @@ private fun AppShell(engine: AgentEngine, speech: SpeechInput) {
         modifier = Modifier.fillMaxSize(),
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("AI Phone Agent") },
+                title = { Text(stringResource(R.string.title_ai_phone_agent)) },
                 actions = {
                     IconButton(onClick = { settingsOpen = true }) {
-                        Icon(Icons.Default.Settings, contentDescription = "Settings")
+                        Icon(Icons.Default.Settings, contentDescription = stringResource(R.string.content_desc_settings))
                     }
                 }
             )
@@ -239,23 +240,21 @@ private fun HeroCard(accessibilityOk: Boolean, apiKeyOk: Boolean, mcpOn: Boolean
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Text(
-                "Drive your phone with natural language",
+                stringResource(R.string.hero_title),
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp
             )
             Text(
-                "An on-device agent that reads the screen via Android's accessibility API and " +
-                    "operates apps for you using Claude. Also exposes the same tools as an MCP " +
-                    "server on your local network so any MCP client can drive the phone.",
+                stringResource(R.string.hero_body),
                 fontSize = 13.sp
             )
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                StatusPill("Accessibility", accessibilityOk)
-                StatusPill("API key", apiKeyOk)
-                StatusPill("MCP", mcpOn, neutralOff = true)
+                StatusPill(stringResource(R.string.status_accessibility), accessibilityOk)
+                StatusPill(stringResource(R.string.status_api_key), apiKeyOk)
+                StatusPill(stringResource(R.string.status_mcp), mcpOn, neutralOff = true)
             }
         }
     }
@@ -304,28 +303,28 @@ private fun SetupCard(
     ) {
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Text(
-                if (allDone) "Setup complete" else "Setup",
+                if (allDone) stringResource(R.string.setup_complete) else stringResource(R.string.setup),
                 fontWeight = FontWeight.SemiBold
             )
             SetupRow(
                 done = accessibilityOk,
-                title = "Enable accessibility service",
-                detail = "Required. Lets the agent read the screen and dispatch taps/text.",
-                actionLabel = if (accessibilityOk) "Open settings" else "Enable",
+                title = stringResource(R.string.setup_accessibility_title),
+                detail = stringResource(R.string.setup_accessibility_detail),
+                actionLabel = if (accessibilityOk) stringResource(R.string.setup_accessibility_open_settings) else stringResource(R.string.setup_accessibility_enable),
                 onAction = onEnableAccessibility
             )
             SetupRow(
                 done = apiKeyOk,
-                title = "Set Anthropic API key",
-                detail = "Required for the in-app agent. Stored in EncryptedSharedPreferences.",
-                actionLabel = if (apiKeyOk) "Change" else "Add key",
+                title = stringResource(R.string.setup_api_key_title),
+                detail = stringResource(R.string.setup_api_key_detail),
+                actionLabel = if (apiKeyOk) stringResource(R.string.setup_api_key_change) else stringResource(R.string.setup_api_key_add),
                 onAction = onOpenSettings
             )
             SetupRow(
                 done = overlayOk,
-                title = "Grant overlay permission",
-                detail = "Optional. Shows a draggable progress + Stop button over other apps.",
-                actionLabel = if (overlayOk) "Granted" else "Grant",
+                title = stringResource(R.string.setup_overlay_title),
+                detail = stringResource(R.string.setup_overlay_detail),
+                actionLabel = if (overlayOk) stringResource(R.string.setup_overlay_granted) else stringResource(R.string.setup_overlay_grant),
                 onAction = onGrantOverlay
             )
         }
@@ -408,7 +407,7 @@ private fun AgentCard(
 
     Card(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("Tell the agent what to do", fontWeight = FontWeight.SemiBold)
+            Text(stringResource(R.string.agent_tell_what_to_do), fontWeight = FontWeight.SemiBold)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
@@ -418,7 +417,7 @@ private fun AgentCard(
                     value = if (listening && partial.isNotEmpty()) partial else instruction,
                     onValueChange = onInstructionChange,
                     modifier = Modifier.weight(1f),
-                    placeholder = { Text("e.g. open Settings and turn on Bluetooth") },
+                    placeholder = { Text(stringResource(R.string.agent_placeholder)) },
                     singleLine = false,
                     enabled = !running && !listening
                 )
@@ -437,7 +436,7 @@ private fun AgentCard(
                 ) {
                     Icon(
                         imageVector = if (listening) Icons.Default.MicOff else Icons.Default.Mic,
-                        contentDescription = if (listening) "Stop listening" else "Speak instruction",
+                        contentDescription = if (listening) stringResource(R.string.agent_stop_listening) else stringResource(R.string.agent_speak_instruction),
                         tint = if (listening) Color(0xFFC62828) else MaterialTheme.colorScheme.onSurface
                     )
                 }
@@ -448,34 +447,35 @@ private fun AgentCard(
                     },
                     enabled = canRun && instruction.isNotBlank()
                 ) {
-                    Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Run agent")
+                    Icon(Icons.AutoMirrored.Filled.Send, contentDescription = stringResource(R.string.agent_run))
                 }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Button(
                     enabled = canRun && instruction.isNotBlank(),
                     onClick = { onRun(instruction.trim()) }
-                ) { Text("Run") }
-                OutlinedButton(enabled = running, onClick = onCancel) { Text("Cancel") }
+                ) { Text(stringResource(R.string.run)) }
+                OutlinedButton(enabled = running, onClick = onCancel) { Text(stringResource(R.string.cancel)) }
             }
             Text(
-                text = "Status: " + when (state) {
-                    AgentEngine.State.Idle -> "idle"
-                    is AgentEngine.State.Running -> "step ${state.step} — ${state.last}"
-                    is AgentEngine.State.Done -> "done (${if (state.success) "ok" else "fail"}, ${state.steps} steps): ${state.summary}"
-                    is AgentEngine.State.Error -> "error after ${state.steps} steps: ${state.message}"
+                text = stringResource(R.string.status_prefix) + when (state) {
+                    AgentEngine.State.Idle -> stringResource(R.string.status_idle)
+                    is AgentEngine.State.Running -> stringResource(R.string.status_step, state.step, state.last)
+                    is AgentEngine.State.Done ->
+                        if (state.success) stringResource(R.string.status_done_ok, state.steps) else stringResource(R.string.status_done_fail, state.steps)
+                    is AgentEngine.State.Error -> stringResource(R.string.status_error_message, state.steps, state.message)
                 },
                 fontSize = 12.sp,
                 fontFamily = FontFamily.Monospace
             )
             when {
                 !enabled -> Text(
-                    "Accessibility service is off — enable it in Setup above.",
+                    stringResource(R.string.warning_accessibility_off),
                     fontSize = 11.sp,
                     color = Color(0xFFC62828)
                 )
                 !apiKeySet -> Text(
-                    "Anthropic API key not set — open Settings (gear) to add one.",
+                    stringResource(R.string.warning_api_key_missing),
                     fontSize = 11.sp,
                     color = Color(0xFFC62828)
                 )
@@ -488,19 +488,19 @@ private fun AgentCard(
 private fun TryThisCard(enabled: Boolean, onPick: (String) -> Unit) {
     val examples = remember {
         listOf(
-            "Open Settings and turn on Bluetooth",
-            "Open Chrome and search for anthropic",
-            "Open the clock app and start a 5 minute timer",
-            "Open WhatsApp and read my latest message",
-            "Open YouTube and play lo-fi beats",
-            "Take a screenshot and open it"
+            stringResource(R.string.example_1),
+            stringResource(R.string.example_2),
+            stringResource(R.string.example_3),
+            stringResource(R.string.example_4),
+            stringResource(R.string.example_5),
+            stringResource(R.string.example_6)
         )
     }
     Card(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("Try this", fontWeight = FontWeight.SemiBold)
+            Text(stringResource(R.string.try_this), fontWeight = FontWeight.SemiBold)
             Text(
-                "Tap any prompt to load it into the box, then Run.",
+                stringResource(R.string.try_this_hint),
                 fontSize = 11.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -551,17 +551,17 @@ private fun UsageCard(
             ) {
                 Text(
                     when (state) {
-                        AgentEngine.State.Idle -> "Run details"
-                        is AgentEngine.State.Running -> "Run in progress"
+                        AgentEngine.State.Idle -> stringResource(R.string.run_details)
+                        is AgentEngine.State.Running -> stringResource(R.string.run_in_progress)
                         is AgentEngine.State.Done ->
-                            if (state.success) "✓ Done in ${state.steps} steps" else "✗ Done (failed) in ${state.steps} steps"
-                        is AgentEngine.State.Error -> "Error after ${state.steps} steps"
+                            if (state.success) stringResource(R.string.status_done_ok, state.steps) else stringResource(R.string.status_done_fail, state.steps)
+                        is AgentEngine.State.Error -> stringResource(R.string.status_error, state.steps)
                     },
                     fontWeight = FontWeight.SemiBold
                 )
                 if (turns.isNotEmpty()) {
                     OutlinedButton(onClick = { expanded = !expanded }) {
-                        Text(if (expanded) "Hide turns" else "Show turns (${turns.size})")
+                        Text(if (expanded) stringResource(R.string.hide_turns) else stringResource(R.string.show_turns, turns.size))
                     }
                 }
             }
@@ -584,7 +584,7 @@ private fun UsageCard(
             )
             if (finished) {
                 Text(
-                    "Returned to this app automatically.",
+                    stringResource(R.string.returned_to_app),
                     fontSize = 10.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -592,10 +592,10 @@ private fun UsageCard(
 
             if (expanded && turns.isNotEmpty()) {
                 Spacer(Modifier.size(4.dp))
-                Text("Per-turn breakdown", fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
+                Text(stringResource(R.string.per_turn_breakdown), fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
                 turns.forEach { t ->
                     Text(
-                        "T${t.turn}  in=${t.input}  cR=${t.cacheRead}  cC=${t.cacheCreation}  out=${t.output}  → ${t.tools.joinToString(",").ifEmpty { "(no tool)" }}",
+                        "T${t.turn}  in=${t.input}  cR=${t.cacheRead}  cC=${t.cacheCreation}  out=${t.output}  \u2192 ${t.tools.joinToString(",").ifEmpty { stringResource(R.string.no_tool) }}",
                         fontFamily = FontFamily.Monospace,
                         fontSize = 10.sp
                     )
@@ -634,9 +634,9 @@ private fun McpCard() {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column(modifier = Modifier.weight(1f)) {
-                    Text("MCP server (LAN)", fontWeight = FontWeight.SemiBold)
+                    Text(stringResource(R.string.mcp_server_lan), fontWeight = FontWeight.SemiBold)
                     Text(
-                        "Expose the same tools to any MCP client on your Wi-Fi.",
+                        stringResource(R.string.mcp_expose_tools),
                         fontSize = 11.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -673,10 +673,10 @@ private fun McpCard() {
                 Spacer(Modifier.size(8.dp))
                 Text(
                     text = when {
-                        mcpEnabled && url != null && onWifi -> "Running — listening on Wi-Fi"
-                        mcpEnabled && !onWifi -> "Running — but no Wi-Fi (cellular only)"
-                        mcpEnabled -> "Running — no local IPv4 detected"
-                        else -> "Stopped"
+                        mcpEnabled && url != null && onWifi -> stringResource(R.string.mcp_running_wifi)
+                        mcpEnabled && !onWifi -> stringResource(R.string.mcp_running_no_wifi)
+                        mcpEnabled -> stringResource(R.string.mcp_running_no_ip)
+                        else -> stringResource(R.string.mcp_stopped)
                     },
                     fontSize = 12.sp,
                     fontWeight = FontWeight.SemiBold
@@ -684,7 +684,7 @@ private fun McpCard() {
             }
             if (!onWifi) {
                 Text(
-                    "⚠ Not on Wi-Fi — exposing this on cellular is a bad idea. Connect to Wi-Fi first.",
+                    stringResource(R.string.mcp_warning_no_wifi),
                     fontSize = 11.sp,
                     color = Color(0xFFC62828)
                 )
@@ -695,23 +695,23 @@ private fun McpCard() {
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 Column(modifier = Modifier.weight(1f)) {
-                    Text("IP", fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(stringResource(R.string.mcp_ip), fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
-                            ip ?: "—",
+                            ip ?: "\u2014",
                             fontFamily = FontFamily.Monospace,
                             fontSize = 14.sp,
                             modifier = Modifier.weight(1f)
                         )
                         if (ip != null) {
                             IconButton(onClick = { copy("IP", ip) }) {
-                                Icon(Icons.Default.ContentCopy, contentDescription = "Copy IP")
+                                Icon(Icons.Default.ContentCopy, contentDescription = stringResource(R.string.mcp_copy_ip))
                             }
                         }
                     }
                 }
                 Column(modifier = Modifier.weight(1f)) {
-                    Text("Port", fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(stringResource(R.string.mcp_port), fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     OutlinedTextField(
                         value = portText,
                         onValueChange = { v ->
@@ -729,7 +729,7 @@ private fun McpCard() {
             }
 
             Column {
-                Text("Endpoint URL", fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(stringResource(R.string.mcp_endpoint_url), fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         url ?: "http://<ip>:$mcpPort/mcp",
@@ -739,19 +739,19 @@ private fun McpCard() {
                     )
                     if (url != null) {
                         IconButton(onClick = { copy("URL", url) }) {
-                            Icon(Icons.Default.ContentCopy, contentDescription = "Copy URL")
+                            Icon(Icons.Default.ContentCopy, contentDescription = stringResource(R.string.mcp_copy_ip))
                         }
                     }
                 }
             }
 
             Column {
-                Text("Bearer token", fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(stringResource(R.string.mcp_bearer_token), fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        text = if (bearer.isEmpty()) "(generated when MCP turns on)"
+                        text = if (bearer.isEmpty()) stringResource(R.string.mcp_bearer_generated)
                                else if (revealBearer) bearer
-                               else "•".repeat(bearer.length.coerceAtMost(28)),
+                               else "\u2022".repeat(bearer.length.coerceAtMost(28)),
                         fontFamily = FontFamily.Monospace,
                         fontSize = 12.sp,
                         modifier = Modifier.weight(1f)
@@ -760,23 +760,23 @@ private fun McpCard() {
                         IconButton(onClick = { revealBearer = !revealBearer }) {
                             Icon(
                                 if (revealBearer) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-                                contentDescription = if (revealBearer) "Hide bearer" else "Show bearer"
+                                contentDescription = if (revealBearer) stringResource(R.string.mcp_hide_bearer) else stringResource(R.string.mcp_show_bearer)
                             )
                         }
                         IconButton(onClick = { copy("bearer", bearer) }) {
-                            Icon(Icons.Default.ContentCopy, contentDescription = "Copy bearer")
+                            Icon(Icons.Default.ContentCopy, contentDescription = stringResource(R.string.mcp_copy_bearer))
                         }
                     }
                 }
                 if (bearer.isEmpty()) {
                     OutlinedButton(onClick = { bearer = AgentSettings.ensureMcpToken(context) }) {
-                        Text("Generate token")
+                        Text(stringResource(R.string.mcp_generate_token))
                     }
                 }
             }
 
             Text(
-                "JSON-RPC methods: initialize · tools/list · tools/call · ping",
+                stringResource(R.string.mcp_jsonrpc_methods),
                 fontSize = 11.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -794,7 +794,7 @@ private fun McpCard() {
                             )
                         }
                     }
-                ) { Text("Self-test (localhost)") }
+                ) { Text(stringResource(R.string.mcp_self_test)) }
                 Text(selfTestResult, fontSize = 10.sp, fontFamily = FontFamily.Monospace)
             }
 
@@ -819,7 +819,7 @@ private fun McpCard() {
   }
 }"""
 
-            Text("Quick test (curl)", fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
+            Text(stringResource(R.string.mcp_quick_test), fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
             Row(verticalAlignment = Alignment.Top) {
                 Text(
                     curl,
@@ -828,12 +828,12 @@ private fun McpCard() {
                     modifier = Modifier.weight(1f)
                 )
                 IconButton(onClick = { copy("curl", curl) }) {
-                    Icon(Icons.Default.ContentCopy, contentDescription = "Copy curl")
+                    Icon(Icons.Default.ContentCopy, contentDescription = stringResource(R.string.mcp_copy_curl))
                 }
             }
 
             Text(
-                "Claude Desktop config (uses npx mcp-remote bridge — Node.js required)",
+                stringResource(R.string.mcp_claude_config),
                 fontSize = 11.sp,
                 fontWeight = FontWeight.SemiBold
             )
@@ -845,14 +845,13 @@ private fun McpCard() {
                     modifier = Modifier.weight(1f)
                 )
                 IconButton(onClick = { copy("Claude config", claudeConfig) }) {
-                    Icon(Icons.Default.ContentCopy, contentDescription = "Copy Claude config")
+                    Icon(Icons.Default.ContentCopy, contentDescription = stringResource(R.string.mcp_copy_config))
                 }
             }
 
             if (!mcpEnabled) {
                 Text(
-                    "Off. Toggle on to expose accessibility tools at /mcp on your local network. " +
-                        "Bearer-token authenticated. Foreground notification shows the URL while running.",
+                    stringResource(R.string.mcp_off_hint),
                     fontSize = 11.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -864,22 +863,22 @@ private fun McpCard() {
 @Composable
 private fun FeaturesCard() {
     val features = listOf(
-        "Reads the screen via accessibility tree (no screenshots, no OCR)" to
-            "Filters to visible/actionable nodes, gives Claude a compact one-line-per-element view.",
-        "Multi-step planning loop with prompt caching" to
-            "System prompt + tool schemas marked cache_control: ephemeral. Big drop in tokens after turn 1.",
-        "Push-to-talk voice input" to
-            "Hold the mic, speak, release — final transcript auto-runs.",
-        "MCP server over HTTP on your LAN" to
-            "Same tool surface as the in-app agent. Bearer-token authenticated. Works with Claude Desktop via mcp-remote bridge.",
-        "Floating progress overlay" to
-            "Draggable status + Stop button visible across other apps while the agent runs.",
-        "Per-turn token accounting" to
-            "Input / cache_read / cache_creation / output broken out per turn so you can sanity-check caching."
+        stringResource(R.string.feature_screen_title) to
+            stringResource(R.string.feature_screen_body),
+        stringResource(R.string.feature_planning_title) to
+            stringResource(R.string.feature_planning_body),
+        stringResource(R.string.feature_voice_title) to
+            stringResource(R.string.feature_voice_body),
+        stringResource(R.string.feature_mcp_title) to
+            stringResource(R.string.feature_mcp_body),
+        stringResource(R.string.feature_overlay_title) to
+            stringResource(R.string.feature_overlay_body),
+        stringResource(R.string.feature_tokens_title) to
+            stringResource(R.string.feature_tokens_body)
     )
     Card(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text("What's in here", fontWeight = FontWeight.SemiBold)
+            Text(stringResource(R.string.whats_in_here), fontWeight = FontWeight.SemiBold)
             features.forEach { (title, body) ->
                 Column {
                     Text("• $title", fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
@@ -902,13 +901,13 @@ private fun PrivacyCard() {
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
     ) {
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("Privacy & safety", fontWeight = FontWeight.SemiBold)
-            Bullet("Screen contents (text + structure) are sent to Anthropic's API on every turn while a run is active.")
-            Bullet("Password fields are masked to •••• before serialization.")
-            Bullet("API key and MCP bearer token are stored in EncryptedSharedPreferences and never logged.")
-            Bullet("MCP is off by default. When on, it binds 0.0.0.0 — only enable on a trusted Wi-Fi.")
-            Bullet("The agent has a hard cap on tool calls per run (configurable). Cancel anytime via the Stop overlay.")
-            Bullet("This app's own package is excluded from MCP screen dumps so a remote client can't tap the toggle off itself.")
+            Text(stringResource(R.string.privacy_safety), fontWeight = FontWeight.SemiBold)
+            Bullet(stringResource(R.string.privacy_1))
+            Bullet(stringResource(R.string.privacy_2))
+            Bullet(stringResource(R.string.privacy_3))
+            Bullet(stringResource(R.string.privacy_4))
+            Bullet(stringResource(R.string.privacy_5))
+            Bullet(stringResource(R.string.privacy_6))
         }
     }
 }
@@ -935,17 +934,17 @@ private fun EventLogCard(events: List<String>) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column(modifier = Modifier.weight(1f)) {
-                    Text("Live event log", fontWeight = FontWeight.SemiBold)
+                    Text(stringResource(R.string.live_event_log), fontWeight = FontWeight.SemiBold)
                     Text(
-                        "Agent + MCP traffic. Filter Logcat tag \"AccessTest\" for full node dumps.",
+                        stringResource(R.string.event_log_hint),
                         fontSize = 10.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
-                OutlinedButton(onClick = { EventLog.clear() }) { Text("Clear") }
+                OutlinedButton(onClick = { EventLog.clear() }) { Text(stringResource(R.string.clear)) }
             }
             if (events.isEmpty()) {
-                Text("No events yet.", fontSize = 12.sp)
+                Text(stringResource(R.string.no_events), fontSize = 12.sp)
             } else {
                 LazyColumn(
                     state = listState,
@@ -974,18 +973,18 @@ private fun FooterCard() {
             onClick = {
                 clipboard.setText(androidx.compose.ui.text.AnnotatedString("https://docs.anthropic.com"))
             },
-            label = { Text("Anthropic docs", fontSize = 11.sp) },
+            label = { Text(stringResource(R.string.anthropic_docs), fontSize = 11.sp) },
             colors = AssistChipDefaults.assistChipColors()
         )
         AssistChip(
             onClick = {
                 clipboard.setText(androidx.compose.ui.text.AnnotatedString("https://modelcontextprotocol.io"))
             },
-            label = { Text("MCP spec", fontSize = 11.sp) },
+            label = { Text(stringResource(R.string.mcp_spec), fontSize = 11.sp) },
             colors = AssistChipDefaults.assistChipColors()
         )
         Text(
-            "Open source — issues + PRs welcome.",
+            stringResource(R.string.open_source_hint),
             fontSize = 10.sp,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -1012,12 +1011,12 @@ private fun SettingsSheet(onDismiss: () -> Unit) {
             modifier = Modifier.fillMaxWidth().padding(16.dp).padding(bottom = 24.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Text("Agent settings", fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.agent_settings), fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.titleMedium)
 
             OutlinedTextField(
                 value = apiKey,
                 onValueChange = { apiKey = it },
-                label = { Text("Anthropic API key (sk-ant-…)") },
+                label = { Text(stringResource(R.string.api_key_label)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true
             )
@@ -1025,14 +1024,14 @@ private fun SettingsSheet(onDismiss: () -> Unit) {
             OutlinedTextField(
                 value = model,
                 onValueChange = { model = it },
-                label = { Text("Model id") },
+                label = { Text(stringResource(R.string.model_id_label)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Ascii)
             )
-            Text("Suggested: claude-sonnet-4-5 (default), claude-haiku-4-5 (faster/cheaper).", fontSize = 11.sp)
+            Text(stringResource(R.string.model_suggestion), fontSize = 11.sp)
 
-            Text("Max tool calls per run: ${maxSteps.toInt()}")
+            Text(stringResource(R.string.max_tool_calls, maxSteps.toInt()))
             Slider(
                 value = maxSteps,
                 onValueChange = { maxSteps = it },
@@ -1048,8 +1047,8 @@ private fun SettingsSheet(onDismiss: () -> Unit) {
                         AgentSettings.setMaxSteps(context, maxSteps.toInt())
                         onDismiss()
                     }
-                }) { Text("Save") }
-                OutlinedButton(onClick = onDismiss) { Text("Cancel") }
+                }) { Text(stringResource(R.string.save)) }
+                OutlinedButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) }
             }
         }
     }

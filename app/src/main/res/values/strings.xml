@@ -2,4 +2,141 @@
     <string name="app_name">A11yPilot</string>
     <string name="accessibility_service_description">Lets A11yPilot read the screen and dispatch taps, text, and gestures so the AI agent can drive the phone on your behalf.</string>
     <string name="accessibility_service_summary">A11yPilot \u2014 AI phone agent</string>
+
+    <!-- App Shell -->
+    <string name="title_ai_phone_agent">AI Phone Agent</string>
+    <string name="content_desc_settings">Settings</string>
+
+    <!-- Hero Card -->
+    <string name="hero_title">Drive your phone with natural language</string>
+    <string name="hero_body">An on-device agent that reads the screen via Android\'s accessibility API and operates apps for you using Claude. Also exposes the same tools as an MCP server on your local network so any MCP client can drive the phone.</string>
+    <string name="status_accessibility">Accessibility</string>
+    <string name="status_api_key">API key</string>
+    <string name="status_mcp">MCP</string>
+
+    <!-- Setup Card -->
+    <string name="setup_complete">Setup complete</string>
+    <string name="setup">Setup</string>
+    <string name="setup_accessibility_title">Enable accessibility service</string>
+    <string name="setup_accessibility_detail">Required. Lets the agent read the screen and dispatch taps/text.</string>
+    <string name="setup_accessibility_open_settings">Open settings</string>
+    <string name="setup_accessibility_enable">Enable</string>
+    <string name="setup_api_key_title">Set Anthropic API key</string>
+    <string name="setup_api_key_detail">Required for the in-app agent. Stored in EncryptedSharedPreferences.</string>
+    <string name="setup_api_key_change">Change</string>
+    <string name="setup_api_key_add">Add key</string>
+    <string name="setup_overlay_title">Grant overlay permission</string>
+    <string name="setup_overlay_detail">Optional. Shows a draggable progress + Stop button over other apps.</string>
+    <string name="setup_overlay_granted">Granted</string>
+    <string name="setup_overlay_grant">Grant</string>
+
+    <!-- Agent Card -->
+    <string name="agent_tell_what_to_do">Tell the agent what to do</string>
+    <string name="agent_placeholder">e.g. open Settings and turn on Bluetooth</string>
+    <string name="agent_stop_listening">Stop listening</string>
+    <string name="agent_speak_instruction">Speak instruction</string>
+    <string name="agent_run">Run agent</string>
+    <string name="run">Run</string>
+    <string name="cancel">Cancel</string>
+    <string name="status_prefix">Status: </string>
+    <string name="status_idle">idle</string>
+    <string name="status_step">step %1$d \u2014 %2$s</string>
+    <string name="status_done_ok">\u2713 Done in %1$d steps</string>
+    <string name="status_done_fail">\u2717 Done (failed) in %1$d steps</string>
+    <string name="status_error">Error after %1$d steps</string>
+    <string name="status_error_message">error after %1$d steps: %2$s</string>
+    <string name="warning_accessibility_off">Accessibility service is off \u2014 enable it in Setup above.</string>
+    <string name="warning_api_key_missing">Anthropic API key not set \u2014 open Settings (gear) to add one.</string>
+
+    <!-- Try This Card -->
+    <string name="try_this">Try this</string>
+    <string name="try_this_hint">Tap any prompt to load it into the box, then Run.</string>
+    <string name="example_1">Open Settings and turn on Bluetooth</string>
+    <string name="example_2">Open Chrome and search for anthropic</string>
+    <string name="example_3">Open the clock app and start a 5 minute timer</string>
+    <string name="example_4">Open WhatsApp and read my latest message</string>
+    <string name="example_5">Open YouTube and play lo-fi beats</string>
+    <string name="example_6">Take a screenshot and open it</string>
+
+    <!-- Usage Card -->
+    <string name="run_details">Run details</string>
+    <string name="run_in_progress">Run in progress</string>
+    <string name="hide_turns">Hide turns</string>
+    <string name="show_turns">Show turns (%1$d)</string>
+    <string name="returned_to_app">Returned to this app automatically.</string>
+    <string name="per_turn_breakdown">Per-turn breakdown</string>
+    <string name="no_tool">(no tool)</string>
+
+    <!-- MCP Card -->
+    <string name="mcp_server_lan">MCP server (LAN)</string>
+    <string name="mcp_expose_tools">Expose the same tools to any MCP client on your Wi-Fi.</string>
+    <string name="mcp_running_wifi">Running \u2014 listening on Wi-Fi</string>
+    <string name="mcp_running_no_wifi">Running \u2014 but no Wi-Fi (cellular only)</string>
+    <string name="mcp_running_no_ip">Running \u2014 no local IPv4 detected</string>
+    <string name="mcp_stopped">Stopped</string>
+    <string name="mcp_warning_no_wifi">\u26a0 Not on Wi-Fi \u2014 exposing this on cellular is a bad idea. Connect to Wi-Fi first.</string>
+    <string name="mcp_ip">IP</string>
+    <string name="mcp_copy_ip">Copy IP</string>
+    <string name="mcp_port">Port</string>
+    <string name="mcp_endpoint_url">Endpoint URL</string>
+    <string name="mcp_bearer_token">Bearer token</string>
+    <string name="mcp_bearer_generated">(generated when MCP turns on)</string>
+    <string name="mcp_hide_bearer">Hide bearer</string>
+    <string name="mcp_show_bearer">Show bearer</string>
+    <string name="mcp_copy_bearer">Copy bearer</string>
+    <string name="mcp_generate_token">Generate token</string>
+    <string name="mcp_jsonrpc_methods">JSON-RPC methods: initialize \u00b7 tools/list \u00b7 tools/call \u00b7 ping</string>
+    <string name="mcp_self_test">Self-test (localhost)</string>
+    <string name="mcp_quick_test">Quick test (curl)</string>
+    <string name="mcp_copy_curl">Copy curl</string>
+    <string name="mcp_claude_config">Claude Desktop config (uses npx mcp-remote bridge \u2014 Node.js required)</string>
+    <string name="mcp_copy_config">Copy Claude config</string>
+    <string name="mcp_off_hint">Off. Toggle on to expose accessibility tools at /mcp on your local network. Bearer-token authenticated. Foreground notification shows the URL while running.</string>
+
+    <!-- Features Card -->
+    <string name="whats_in_here">What\'s in here</string>
+    <string name="feature_screen_title">Reads the screen via accessibility tree (no screenshots, no OCR)</string>
+    <string name="feature_screen_body">Filters to visible/actionable nodes, gives Claude a compact one-line-per-element view.</string>
+    <string name="feature_planning_title">Multi-step planning loop with prompt caching</string>
+    <string name="feature_planning_body">System prompt + tool schemas marked cache_control: ephemeral. Big drop in tokens after turn 1.</string>
+    <string name="feature_voice_title">Push-to-talk voice input</string>
+    <string name="feature_voice_body">Hold the mic, speak, release \u2014 final transcript auto-runs.</string>
+    <string name="feature_mcp_title">MCP server over HTTP on your LAN</string>
+    <string name="feature_mcp_body">Same tool surface as the in-app agent. Bearer-token authenticated. Works with Claude Desktop via mcp-remote bridge.</string>
+    <string name="feature_overlay_title">Floating progress overlay</string>
+    <string name="feature_overlay_body">Draggable status + Stop button visible across other apps while the agent runs.</string>
+    <string name="feature_tokens_title">Per-turn token accounting</string>
+    <string name="feature_tokens_body">Input / cache_read / cache_creation / output broken out per turn so you can sanity-check caching.</string>
+
+    <!-- Privacy Card -->
+    <string name="privacy_safety">Privacy &amp; safety</string>
+    <string name="privacy_1">Screen contents (text + structure) are sent to Anthropic\'s API on every turn while a run is active.</string>
+    <string name="privacy_2">Password fields are masked to \u2022\u2022\u2022\u2022 before serialization.</string>
+    <string name="privacy_3">API key and MCP bearer token are stored in EncryptedSharedPreferences and never logged.</string>
+    <string name="privacy_4">MCP is off by default. When on, it binds 0.0.0.0 \u2014 only enable on a trusted Wi-Fi.</string>
+    <string name="privacy_5">The agent has a hard cap on tool calls per run (configurable). Cancel anytime via the Stop overlay.</string>
+    <string name="privacy_6">This app\'s own package is excluded from MCP screen dumps so a remote client can\'t tap the toggle off itself.</string>
+
+    <!-- Event Log Card -->
+    <string name="live_event_log">Live event log</string>
+    <string name="event_log_hint">Agent + MCP traffic. Filter Logcat tag \"AccessTest\" for full node dumps.</string>
+    <string name="clear">Clear</string>
+    <string name="no_events">No events yet.</string>
+
+    <!-- Footer Card -->
+    <string name="anthropic_docs">Anthropic docs</string>
+    <string name="mcp_spec">MCP spec</string>
+    <string name="open_source_hint">Open source \u2014 issues + PRs welcome.</string>
+
+    <!-- Settings Sheet -->
+    <string name="agent_settings">Agent settings</string>
+    <string name="api_key_label">Anthropic API key (sk-ant-\u2026)</string>
+    <string name="model_id_label">Model id</string>
+    <string name="model_suggestion">Suggested: claude-sonnet-4-5 (default), claude-haiku-4-5 (faster/cheaper).</string>
+    <string name="max_tool_calls">Max tool calls per run: %1$d</string>
+    <string name="save">Save</string>
+
+    <!-- McpService -->
+    <string name="mcp_notification_title">MCP server running</string>
+    <string name="mcp_channel_name">MCP server</string>
 </resources>

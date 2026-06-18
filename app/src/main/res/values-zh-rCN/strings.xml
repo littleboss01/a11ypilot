@@ -1,0 +1,142 @@
+<resources>
+    <string name="app_name">A11yPilot</string>
+    <string name="accessibility_service_description">允许 A11yPilot 读取屏幕并执行点击、输入和手势操作，以便 AI 代理可以代替您操作手机。</string>
+    <string name="accessibility_service_summary">A11yPilot \u2014 AI 手机代理</string>
+
+    <!-- App Shell -->
+    <string name="title_ai_phone_agent">AI 手机代理</string>
+    <string name="content_desc_settings">设置</string>
+
+    <!-- Hero Card -->
+    <string name="hero_title">用自然语言操控你的手机</string>
+    <string name="hero_body">一个设备端代理，通过 Android 无障碍 API 读取屏幕，使用 Claude 为你操作应用。同时在本地网络上作为 MCP 服务器暴露相同工具，任何 MCP 客户端都可以操控手机。</string>
+    <string name="status_accessibility">无障碍</string>
+    <string name="status_api_key">API 密钥</string>
+    <string name="status_mcp">MCP</string>
+
+    <!-- Setup Card -->
+    <string name="setup_complete">设置完成</string>
+    <string name="setup">设置</string>
+    <string name="setup_accessibility_title">启用无障碍服务</string>
+    <string name="setup_accessibility_detail">必需。让代理读取屏幕并执行点击/输入。</string>
+    <string name="setup_accessibility_open_settings">打开设置</string>
+    <string name="setup_accessibility_enable">启用</string>
+    <string name="setup_api_key_title">设置 Anthropic API 密钥</string>
+    <string name="setup_api_key_detail">应用内代理必需。存储在 EncryptedSharedPreferences 中。</string>
+    <string name="setup_api_key_change">更改</string>
+    <string name="setup_api_key_add">添加密钥</string>
+    <string name="setup_overlay_title">授予悬浮窗权限</string>
+    <string name="setup_overlay_detail">可选。在其他应用上显示可拖动的进度条和停止按钮。</string>
+    <string name="setup_overlay_granted">已授予</string>
+    <string name="setup_overlay_grant">授予</string>
+
+    <!-- Agent Card -->
+    <string name="agent_tell_what_to_do">告诉代理要做什么</string>
+    <string name="agent_placeholder">例如：打开设置并开启蓝牙</string>
+    <string name="agent_stop_listening">停止录音</string>
+    <string name="agent_speak_instruction">语音输入</string>
+    <string name="agent_run">运行代理</string>
+    <string name="run">运行</string>
+    <string name="cancel">取消</string>
+    <string name="status_prefix">状态: </string>
+    <string name="status_idle">空闲</string>
+    <string name="status_step">步骤 %1$d \u2014 %2$s</string>
+    <string name="status_done_ok">\u2713 完成，共 %1$d 步</string>
+    <string name="status_done_fail">\u2717 失败，共 %1$d 步</string>
+    <string name="status_error">%1$d 步后出错</string>
+    <string name="status_error_message">%1$d 步后出错: %2$s</string>
+    <string name="warning_accessibility_off">无障碍服务已关闭 \u2014 请在上方设置中启用。</string>
+    <string name="warning_api_key_missing">未设置 Anthropic API 密钥 \u2014 请点击设置（齿轮图标）添加。</string>
+
+    <!-- Try This Card -->
+    <string name="try_this">试试看</string>
+    <string name="try_this_hint">点击任意提示词加载到输入框，然后运行。</string>
+    <string name="example_1">打开设置并开启蓝牙</string>
+    <string name="example_2">打开 Chrome 搜索 anthropic</string>
+    <string name="example_3">打开时钟应用并设置 5 分钟计时器</string>
+    <string name="example_4">打开 WhatsApp 阅读最新消息</string>
+    <string name="example_5">打开 YouTube 播放 lo-fi 音乐</string>
+    <string name="example_6">截图并打开它</string>
+
+    <!-- Usage Card -->
+    <string name="run_details">运行详情</string>
+    <string name="run_in_progress">运行中</string>
+    <string name="hide_turns">隐藏轮次</string>
+    <string name="show_turns">显示轮次 (%1$d)</string>
+    <string name="returned_to_app">已自动返回此应用。</string>
+    <string name="per_turn_breakdown">各轮次详情</string>
+    <string name="no_tool">(无工具)</string>
+
+    <!-- MCP Card -->
+    <string name="mcp_server_lan">MCP 服务器 (局域网)</string>
+    <string name="mcp_expose_tools">将相同工具暴露给 Wi-Fi 上的任何 MCP 客户端。</string>
+    <string name="mcp_running_wifi">运行中 \u2014 正在 Wi-Fi 上监听</string>
+    <string name="mcp_running_no_wifi">运行中 \u2014 但未连接 Wi-Fi（仅蜂窝网络）</string>
+    <string name="mcp_running_no_ip">运行中 \u2014 未检测到本地 IPv4</string>
+    <string name="mcp_stopped">已停止</string>
+    <string name="mcp_warning_no_wifi">\u26a0 未连接 Wi-Fi \u2014 在蜂窝网络上暴露服务不安全。请先连接 Wi-Fi。</string>
+    <string name="mcp_ip">IP</string>
+    <string name="mcp_copy_ip">复制 IP</string>
+    <string name="mcp_port">端口</string>
+    <string name="mcp_endpoint_url">端点 URL</string>
+    <string name="mcp_bearer_token">Bearer 令牌</string>
+    <string name="mcp_bearer_generated">（开启 MCP 时自动生成）</string>
+    <string name="mcp_hide_bearer">隐藏令牌</string>
+    <string name="mcp_show_bearer">显示令牌</string>
+    <string name="mcp_copy_bearer">复制令牌</string>
+    <string name="mcp_generate_token">生成令牌</string>
+    <string name="mcp_jsonrpc_methods">JSON-RPC 方法: initialize \u00b7 tools/list \u00b7 tools/call \u00b7 ping</string>
+    <string name="mcp_self_test">自检 (localhost)</string>
+    <string name="mcp_quick_test">快速测试 (curl)</string>
+    <string name="mcp_copy_curl">复制 curl</string>
+    <string name="mcp_claude_config">Claude Desktop 配置（使用 npx mcp-remote 桥接 \u2014 需要 Node.js）</string>
+    <string name="mcp_copy_config">复制 Claude 配置</string>
+    <string name="mcp_off_hint">已关闭。开启后将在本地网络 /mcp 暴露无障碍工具。使用 Bearer 令牌认证。运行时前台通知显示 URL。</string>
+
+    <!-- Features Card -->
+    <string name="whats_in_here">功能介绍</string>
+    <string name="feature_screen_title">通过无障碍树读取屏幕（无截图、无 OCR）</string>
+    <string name="feature_screen_body">过滤为可见/可操作节点，为 Claude 提供紧凑的逐元素视图。</string>
+    <string name="feature_planning_title">多步规划循环与提示缓存</string>
+    <string name="feature_planning_body">系统提示词 + 工具 schema 标记 cache_control: ephemeral。首轮后 token 大幅减少。</string>
+    <string name="feature_voice_title">按键说话语音输入</string>
+    <string name="feature_voice_body">按住麦克风说话，松开即可自动运行。</string>
+    <string name="feature_mcp_title">局域网 HTTP MCP 服务器</string>
+    <string name="feature_mcp_body">与应用内代理相同的工具接口。Bearer 令牌认证。通过 mcp-remote 桥接与 Claude Desktop 配合使用。</string>
+    <string name="feature_overlay_title">悬浮进度条</string>
+    <string name="feature_overlay_body">代理运行时在其他应用上显示可拖动的状态和停止按钮。</string>
+    <string name="feature_tokens_title">逐轮次 token 统计</string>
+    <string name="feature_tokens_body">按轮次显示输入 / 缓存读取 / 缓存创建 / 输出，方便验证缓存效果。</string>
+
+    <!-- Privacy Card -->
+    <string name="privacy_safety">隐私与安全</string>
+    <string name="privacy_1">运行期间，屏幕内容（文本 + 结构）会在每轮发送到 Anthropic API。</string>
+    <string name="privacy_2">密码字段在序列化前会掩码为 \u2022\u2022\u2022\u2022。</string>
+    <string name="privacy_3">API 密钥和 MCP Bearer 令牌存储在 EncryptedSharedPreferences 中，绝不记录日志。</string>
+    <string name="privacy_4">MCP 默认关闭。开启时绑定 0.0.0.0 \u2014 仅在受信任的 Wi-Fi 上启用。</string>
+    <string name="privacy_5">代理有硬性工具调用次数上限（可配置）。可随时通过悬浮窗停止按钮取消。</string>
+    <string name="privacy_6">本应用自身的包名会从 MCP 屏幕转储中排除，防止远程客户端关闭开关。</string>
+
+    <!-- Event Log Card -->
+    <string name="live_event_log">实时事件日志</string>
+    <string name="event_log_hint">代理 + MCP 流量。过滤 Logcat 标签 \"AccessTest\" 查看完整节点转储。</string>
+    <string name="clear">清除</string>
+    <string name="no_events">暂无事件。</string>
+
+    <!-- Footer Card -->
+    <string name="anthropic_docs">Anthropic 文档</string>
+    <string name="mcp_spec">MCP 规范</string>
+    <string name="open_source_hint">开源项目 \u2014 欢迎提交 issue 和 PR。</string>
+
+    <!-- Settings Sheet -->
+    <string name="agent_settings">代理设置</string>
+    <string name="api_key_label">Anthropic API 密钥 (sk-ant-\u2026)</string>
+    <string name="model_id_label">模型 ID</string>
+    <string name="model_suggestion">推荐: claude-sonnet-4-5（默认），claude-haiku-4-5（更快/更便宜）。</string>
+    <string name="max_tool_calls">每次运行最大工具调用次数: %1$d</string>
+    <string name="save">保存</string>
+
+    <!-- McpService -->
+    <string name="mcp_notification_title">MCP 服务器运行中</string>
+    <string name="mcp_channel_name">MCP 服务器</string>
+</resources>

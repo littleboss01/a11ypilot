@@ -80,7 +80,7 @@ class McpService : android.app.Service() {
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
         return NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("MCP server running")
+            .setContentTitle(getString(R.string.mcp_notification_title))
             .setContentText("http://$ip:$port/mcp")
             .setSmallIcon(R.mipmap.ic_launcher)
             .setOngoing(true)
@@ -133,7 +133,7 @@ class McpService : android.app.Service() {
                 nm.createNotificationChannel(
                     NotificationChannel(
                         CHANNEL_ID,
-                        "MCP server",
+                        ctx.getString(R.string.mcp_channel_name),
                         NotificationManager.IMPORTANCE_LOW
                     )
                 )
