@@ -36,8 +36,17 @@ POLICY
 
 STYLE: no prose, no chain-of-thought; just call a tool."""
 
+    /**
+     * Build the effective system prompt.
+     * If [customPrompt] is non-empty, append it to the default prompt.
+     */
+    fun systemPrompt(customPrompt: String = ""): String {
+        if (customPrompt.isBlank()) return SYSTEM
+        return "$SYSTEM\n\n--- CUSTOM INSTRUCTIONS ---\n$customPrompt"
+    }
+
     /** Tool definitions in the format the Anthropic /v1/messages API expects. */
-    fun anthropicTools(): JsonArray = buildJsonArray {
+    fun anthropicTools(mcpTools: List<McpClient.McpTool> = emptyList()): JsonArray = buildJsonArray {
         addTool(this, "dump_screen", "Re-read and return the current screen tree.", emptyMap())
         addTool(this, "screenshot",
             "Take a JPEG screenshot of the current display and return it alongside the screen tree. " +
@@ -81,6 +90,14 @@ STYLE: no prose, no chain-of-thought; just call a tool."""
             "success" to schemaBool("True if the user instruction has been satisfied."),
             "summary" to schemaStr("One-sentence summary of what was done or why it failed.")
         ), required = listOf("success", "summary"))
+        // Append MCP tools with mcp_ prefix
+        for (mcpTool in mcpTools) {
+            add(buildJsonObject {
+                put("name", "mcp_" + mcpTool.name)
+                put("description", "[MCP] ${mcpTool.description}")
+                put("input_schema", mcpTool.inputSchema)
+            })
+        }
     }
 
     private fun addTool(
@@ -107,7 +124,7 @@ STYLE: no prose, no chain-of-thought; just call a tool."""
     }
 
     private fun schemaInt(description: String, optional: Boolean = false): JsonObject = buildJsonObject {
-        put("type", if (optional) "integer" else "integer")
+        put("type", "integer")
         put("description", description)
     }
     private fun schemaStr(description: String): JsonObject = buildJsonObject {

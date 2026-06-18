@@ -25,6 +25,8 @@ object AgentSettings {
     private val KEY_MCP_PORT = intPreferencesKey("mcp_port")
     private val KEY_PROVIDER = stringPreferencesKey("provider")
     private val KEY_BASE_URL = stringPreferencesKey("base_url")
+    private val KEY_SYSTEM_PROMPT = stringPreferencesKey("system_prompt")
+    private val KEY_MCP_SERVERS = stringPreferencesKey("mcp_servers")
 
     private const val SECRETS_FILE = "agent_secrets"
     private const val SECRET_API_KEY = "anthropic_api_key"
@@ -35,6 +37,8 @@ object AgentSettings {
     const val DEFAULT_MCP_PORT = 8765
     const val DEFAULT_PROVIDER = "anthropic"
     const val DEFAULT_BASE_URL = ""
+    const val DEFAULT_SYSTEM_PROMPT = ""
+    const val DEFAULT_MCP_SERVERS = "[]"
 
     fun model(ctx: Context): Flow<String> =
         ctx.dataStore.data.map { it[KEY_MODEL] ?: DEFAULT_MODEL }
@@ -54,6 +58,12 @@ object AgentSettings {
     fun baseUrl(ctx: Context): Flow<String> =
         ctx.dataStore.data.map { it[KEY_BASE_URL] ?: DEFAULT_BASE_URL }
 
+    fun systemPrompt(ctx: Context): Flow<String> =
+        ctx.dataStore.data.map { it[KEY_SYSTEM_PROMPT] ?: DEFAULT_SYSTEM_PROMPT }
+
+    fun mcpServers(ctx: Context): Flow<String> =
+        ctx.dataStore.data.map { it[KEY_MCP_SERVERS] ?: DEFAULT_MCP_SERVERS }
+
     suspend fun setModel(ctx: Context, value: String) =
         ctx.dataStore.edit { it[KEY_MODEL] = value }
 
@@ -72,6 +82,12 @@ object AgentSettings {
     suspend fun setBaseUrl(ctx: Context, value: String) =
         ctx.dataStore.edit { it[KEY_BASE_URL] = value }
 
+    suspend fun setSystemPrompt(ctx: Context, value: String) =
+        ctx.dataStore.edit { it[KEY_SYSTEM_PROMPT] = value }
+
+    suspend fun setMcpServers(ctx: Context, value: String) =
+        ctx.dataStore.edit { it[KEY_MCP_SERVERS] = value }
+
     suspend fun snapshot(ctx: Context): Snapshot {
         val prefs = ctx.dataStore.data.first()
         return Snapshot(
@@ -81,6 +97,8 @@ object AgentSettings {
             mcpPort = prefs[KEY_MCP_PORT] ?: DEFAULT_MCP_PORT,
             provider = prefs[KEY_PROVIDER] ?: DEFAULT_PROVIDER,
             baseUrl = prefs[KEY_BASE_URL] ?: DEFAULT_BASE_URL,
+            systemPrompt = prefs[KEY_SYSTEM_PROMPT] ?: DEFAULT_SYSTEM_PROMPT,
+            mcpServers = prefs[KEY_MCP_SERVERS] ?: DEFAULT_MCP_SERVERS,
             apiKey = readSecret(ctx, SECRET_API_KEY),
             mcpToken = readSecret(ctx, SECRET_MCP_TOKEN)
         )
@@ -93,6 +111,8 @@ object AgentSettings {
         val mcpPort: Int,
         val provider: String,
         val baseUrl: String,
+        val systemPrompt: String,
+        val mcpServers: String,
         val apiKey: String,
         val mcpToken: String
     )

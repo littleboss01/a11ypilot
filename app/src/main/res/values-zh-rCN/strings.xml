@@ -141,6 +141,10 @@
     <string name="model_suggestion">Anthropic: claude-sonnet-4-5（默认）。OpenAI: gpt-4o（默认）。</string>
     <string name="base_url_label">Base URL</string>
     <string name="base_url_placeholder">https://api.example.com</string>
+    <string name="system_prompt_label">自定义系统提示词</string>
+    <string name="system_prompt_placeholder">追加给 AI 的额外指令（追加在默认提示词之后）</string>
+    <string name="mcp_servers_label">MCP 服务器（JSON）</string>
+    <string name="mcp_servers_placeholder">[{"url":"http://host:port/mcp","token":"..."}]</string>
     <string name="max_tool_calls">每次运行最大工具调用次数: %1$d</string>
     <string name="save">保存</string>
 

@@ -141,6 +141,10 @@
     <string name="model_suggestion">Anthropic: claude-sonnet-4-5 (default). OpenAI: gpt-4o (default).</string>
     <string name="base_url_label">Base URL</string>
     <string name="base_url_placeholder">https://api.example.com</string>
+    <string name="system_prompt_label">Custom system prompt</string>
+    <string name="system_prompt_placeholder">Additional instructions for the AI (appended to default)</string>
+    <string name="mcp_servers_label">MCP servers (JSON)</string>
+    <string name="mcp_servers_placeholder">[{"url":"http://host:port/mcp","token":"..."}]</string>
     <string name="max_tool_calls">Max tool calls per run: %1$d</string>
     <string name="save">Save</string>
 

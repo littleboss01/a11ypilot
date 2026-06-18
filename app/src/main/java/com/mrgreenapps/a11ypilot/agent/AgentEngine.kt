@@ -15,7 +15,10 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.put
 
 /**
  * Drives the conversational tool-use loop:
@@ -111,8 +114,15 @@ class AgentEngine(
         _state.value = State.Running(0, "starting")
         AgentOverlay.update(overlayStatus(), usageLine())
 
+        // Discover MCP tools
+        val mcpTools = discoverMcpTools(settings.mcpServers)
+        if (mcpTools.isNotEmpty()) {
+            EventLog.append("agent> discovered ${mcpTools.size} MCP tools")
+        }
+
         val maxSteps = settings.maxSteps
         val history = mutableListOf<AnthropicClient.Message>()
+        val systemPrompt = Prompts.systemPrompt(settings.systemPrompt)
 
         // Seed: instruction + initial screen.
         val initial = executor.dumpScreen()
@@ -130,7 +140,7 @@ class AgentEngine(
         }
         history.add(AnthropicClient.Message.User(AnthropicClient.userText(initialUserText)))
 
-        val anthropicTools = Prompts.anthropicTools()
+        val anthropicTools = Prompts.anthropicTools(mcpTools)
         val isOpenAI = settings.provider == "openai"
 
         var step = 0
@@ -162,7 +172,7 @@ class AgentEngine(
                             is AnthropicClient.Message.Assistant -> OpenAIClient.Message.Assistant(m.content)
                         }
                     }
-                    val openaiReply = openaiClient.complete(openaiHistory, anthropicTools, Prompts.SYSTEM)
+                    val openaiReply = openaiClient.complete(openaiHistory, anthropicTools, systemPrompt)
                     AnthropicClient.Reply(
                         stopReason = openaiReply.stopReason,
                         assistantContent = openaiReply.assistantContent,
@@ -178,7 +188,8 @@ class AgentEngine(
                     val anthropicClient = AnthropicClient(
                         apiKey = settings.apiKey,
                         model = settings.model,
-                        baseUrl = settings.baseUrl
+                        baseUrl = settings.baseUrl,
+                        systemPrompt = systemPrompt
                     )
                     anthropicClient.complete(history)
                 }
@@ -297,7 +308,9 @@ class AgentEngine(
                 ?: default
                 ?: throw IllegalArgumentException("Missing bool '$key'")
         return try {
-            when (name) {
+            if (name.startsWith("mcp_")) {
+                dispatchMcpTool(name.removePrefix("mcp_"), input)
+            } else when (name) {
                 "dump_screen" -> executor.dumpScreen()
                 "screenshot" -> executor.screenshot()
                 "click" -> executor.click(int("id"))
@@ -316,4 +329,57 @@ class AgentEngine(
             ToolExecutor.Result.Err(t.message ?: "dispatch error")
         }
     }
+
+    private suspend fun dispatchMcpTool(toolName: String, input: JsonObject): ToolExecutor.Result {
+        val settings = AgentSettings.snapshot(ctx)
+        val servers = parseMcpServers(settings.mcpServers)
+        for (server in servers) {
+            try {
+                val client = McpClient(server.url, server.token)
+                if (client.initialize()) {
+                    val result = client.callTool(toolName, input)
+                    return ToolExecutor.Result.Ok(
+                        screen = result,
+                        foregroundApp = "mcp:${server.url}"
+                    )
+                }
+            } catch (_: Throwable) { }
+        }
+        return ToolExecutor.Result.Err("MCP tool '$toolName' failed: no server available")
+    }
+
+    private suspend fun discoverMcpTools(serversJson: String): List<McpClient.McpTool> {
+        val servers = parseMcpServers(serversJson)
+        val allTools = mutableListOf<McpClient.McpTool>()
+        for (server in servers) {
+            try {
+                val client = McpClient(server.url, server.token)
+                if (client.initialize()) {
+                    val tools = client.listTools()
+                    allTools.addAll(tools)
+                    EventLog.append("mcp> ${server.url}: ${tools.size} tools")
+                }
+            } catch (t: Throwable) {
+                EventLog.append("mcp> ${server.url} failed: ${t.message}")
+            }
+        }
+        return allTools
+    }
+
+    private fun parseMcpServers(json: String): List<McpServerConfig> {
+        return try {
+            val arr = kotlinx.serialization.json.Json.parseToJsonElement(json).jsonArray
+            arr.map { el ->
+                val obj = el.jsonObject
+                McpServerConfig(
+                    url = obj["url"]?.jsonPrimitive?.content ?: "",
+                    token = obj["token"]?.jsonPrimitive?.content ?: ""
+                )
+            }.filter { it.url.isNotBlank() }
+        } catch (_: Throwable) {
+            emptyList()
+        }
+    }
+
+    private data class McpServerConfig(val url: String, val token: String)
 }

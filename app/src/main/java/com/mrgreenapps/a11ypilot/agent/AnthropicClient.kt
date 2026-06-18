@@ -32,7 +32,8 @@ class AnthropicClient(
     private val apiKey: String,
     private val model: String,
     private val maxOutputTokens: Int = 1024,
-    private val baseUrl: String = ""
+    private val baseUrl: String = "",
+    private val systemPrompt: String = Prompts.SYSTEM
 ) {
     private val http = OkHttpClient.Builder()
         .connectTimeout(20, TimeUnit.SECONDS)
@@ -71,7 +72,7 @@ class AnthropicClient(
             putJsonArray("system") {
                 add(buildJsonObject {
                     put("type", "text")
-                    put("text", Prompts.SYSTEM)
+                    put("text", systemPrompt)
                     putJsonObject("cache_control") { put("type", "ephemeral") }
                 })
             }

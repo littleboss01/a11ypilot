@@ -1011,6 +1011,8 @@ private fun SettingsSheet(onDismiss: () -> Unit) {
     var maxSteps by remember { mutableStateOf(initialSnapshot?.maxSteps?.toFloat() ?: AgentSettings.DEFAULT_MAX_STEPS.toFloat()) }
     var provider by remember { mutableStateOf(initialSnapshot?.provider ?: AgentSettings.DEFAULT_PROVIDER) }
     var baseUrl by remember { mutableStateOf(initialSnapshot?.baseUrl.orEmpty()) }
+    var systemPrompt by remember { mutableStateOf(initialSnapshot?.systemPrompt.orEmpty()) }
+    var mcpServers by remember { mutableStateOf(initialSnapshot?.mcpServers ?: AgentSettings.DEFAULT_MCP_SERVERS) }
 
     val providerOptions = listOf("anthropic", "anthropic_compat", "openai")
     val providerLabels = mapOf(
@@ -1096,6 +1098,26 @@ private fun SettingsSheet(onDismiss: () -> Unit) {
                 steps = 44
             )
 
+            OutlinedTextField(
+                value = systemPrompt,
+                onValueChange = { systemPrompt = it },
+                label = { Text(stringResource(R.string.system_prompt_label)) },
+                placeholder = { Text(stringResource(R.string.system_prompt_placeholder)) },
+                modifier = Modifier.fillMaxWidth(),
+                minLines = 2,
+                maxLines = 5
+            )
+
+            OutlinedTextField(
+                value = mcpServers,
+                onValueChange = { mcpServers = it },
+                label = { Text(stringResource(R.string.mcp_servers_label)) },
+                placeholder = { Text(stringResource(R.string.mcp_servers_placeholder)) },
+                modifier = Modifier.fillMaxWidth(),
+                minLines = 2,
+                maxLines = 5
+            )
+
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Button(onClick = {
                     AgentSettings.setApiKey(context, apiKey.trim())
@@ -1104,6 +1126,8 @@ private fun SettingsSheet(onDismiss: () -> Unit) {
                         AgentSettings.setMaxSteps(context, maxSteps.toInt())
                         AgentSettings.setProvider(context, provider)
                         AgentSettings.setBaseUrl(context, baseUrl.trim())
+                        AgentSettings.setSystemPrompt(context, systemPrompt.trim())
+                        AgentSettings.setMcpServers(context, mcpServers.trim())
                         onDismiss()
                     }
                 }) { Text(stringResource(R.string.save)) }
