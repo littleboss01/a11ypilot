@@ -1,6 +1,7 @@
 package com.mrgreenapps.a11ypilot.agent
 
 import android.graphics.Rect
+import android.os.Build
 import android.view.accessibility.AccessibilityNodeInfo
 
 /**
@@ -71,9 +72,11 @@ object ScreenSerializer {
             if (text.isNotEmpty()) {
                 builder.append(" \"").append(escape(text.take(MAX_TEXT))).append('"')
             }
-            val hint = node.hintText?.toString().orEmpty()
-            if (hint.isNotEmpty() && hint != text) {
-                builder.append(" ?").append(escape(hint.take(MAX_TEXT)))
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                val hint = node.hintText?.toString().orEmpty()
+                if (hint.isNotEmpty() && hint != text) {
+                    builder.append(" ?").append(escape(hint.take(MAX_TEXT)))
+                }
             }
             val flags = buildFlags(node)
             if (flags.isNotEmpty()) builder.append(' ').append(flags)
@@ -96,7 +99,7 @@ object ScreenSerializer {
         if (b.isEmpty || !Rect.intersects(b, screen)) return false
         val hasText = !n.text.isNullOrBlank() ||
             !n.contentDescription.isNullOrBlank() ||
-            !n.hintText.isNullOrBlank()
+            (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && !n.hintText.isNullOrBlank())
         val isAction = n.isClickable || n.isLongClickable || n.isCheckable ||
             n.isEditable || n.isScrollable || n.isFocusable
         return hasText || isAction
