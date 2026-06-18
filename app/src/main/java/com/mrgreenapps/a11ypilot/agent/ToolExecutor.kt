@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Path
 import android.graphics.Rect
+import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager
 import android.view.accessibility.AccessibilityNodeInfo
@@ -48,8 +49,17 @@ class ToolExecutor(
 
     private fun screenSize(): Pair<Int, Int> {
         val wm = appContext.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-        val m = wm.maximumWindowMetrics.bounds
-        return m.width() to m.height()
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val m = wm.maximumWindowMetrics.bounds
+            m.width() to m.height()
+        } else {
+            @Suppress("DEPRECATION")
+            val d = wm.defaultDisplay
+            val out = android.graphics.Point()
+            @Suppress("DEPRECATION")
+            d.getSize(out)
+            out.x to out.y
+        }
     }
 
     private fun snapshotNow(): ScreenSerializer.Snapshot {
