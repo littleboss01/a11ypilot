@@ -99,9 +99,18 @@ class OpenAIClient(
                         if (toolResults.isNotEmpty()) {
                             put("content", buildJsonArray {
                                 for (tr in toolResults) {
+                                    val content = tr["content"]
+                                    val text = when {
+                                        content == null -> ""
+                                        content is kotlinx.serialization.json.JsonArray -> {
+                                            content.filter { it.jsonObject["type"]?.jsonPrimitive?.contentOrNull == "text" }
+                                                .joinToString("\n") { it.jsonObject["text"]?.jsonPrimitive?.content ?: "" }
+                                        }
+                                        else -> content.jsonPrimitive.contentOrNull ?: ""
+                                    }
                                     add(buildJsonObject {
                                         put("type", "text")
-                                        put("content", tr["content"]?.jsonPrimitive?.content ?: "")
+                                        put("content", text)
                                     })
                                 }
                             })
