@@ -130,9 +130,17 @@
 
     <!-- Settings Sheet -->
     <string name="agent_settings">Agent settings</string>
-    <string name="api_key_label">Anthropic API key (sk-ant-\u2026)</string>
+    <string name="provider_label">Provider</string>
+    <string name="provider_anthropic">Anthropic (Official)</string>
+    <string name="provider_anthropic_compat">Anthropic (Third-party)</string>
+    <string name="provider_openai">OpenAI</string>
+    <string name="api_key_label">API key</string>
+    <string name="api_key_label_anthropic">Anthropic API key (sk-ant-\u2026)</string>
+    <string name="api_key_label_openai">OpenAI API key (sk-\u2026)</string>
     <string name="model_id_label">Model id</string>
-    <string name="model_suggestion">Suggested: claude-sonnet-4-5 (default), claude-haiku-4-5 (faster/cheaper).</string>
+    <string name="model_suggestion">Anthropic: claude-sonnet-4-5 (default). OpenAI: gpt-4o (default).</string>
+    <string name="base_url_label">Base URL</string>
+    <string name="base_url_placeholder">https://api.example.com</string>
     <string name="max_tool_calls">Max tool calls per run: %1$d</string>
     <string name="save">Save</string>
 

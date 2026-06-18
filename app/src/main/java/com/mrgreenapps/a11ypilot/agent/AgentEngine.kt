@@ -107,11 +107,10 @@ class AgentEngine(
             bringAppToFront()
             return
         }
-        EventLog.append("agent> START: $instruction")
+        EventLog.append("agent> START: $instruction (${settings.provider})")
         _state.value = State.Running(0, "starting")
         AgentOverlay.update(overlayStatus(), usageLine())
 
-        val client = AnthropicClient(apiKey = settings.apiKey, model = settings.model)
         val maxSteps = settings.maxSteps
         val history = mutableListOf<AnthropicClient.Message>()
 
@@ -131,6 +130,9 @@ class AgentEngine(
         }
         history.add(AnthropicClient.Message.User(AnthropicClient.userText(initialUserText)))
 
+        val anthropicTools = Prompts.anthropicTools()
+        val isOpenAI = settings.provider == "openai"
+
         var step = 0
         while (true) {
             if (!scope.isActive || runJob?.isCancelled == true) {
@@ -148,7 +150,38 @@ class AgentEngine(
             }
 
             val reply = try {
-                client.complete(history)
+                if (isOpenAI) {
+                    val openaiClient = OpenAIClient(
+                        apiKey = settings.apiKey,
+                        model = settings.model,
+                        baseUrl = settings.baseUrl
+                    )
+                    val openaiHistory = history.map { m ->
+                        when (m) {
+                            is AnthropicClient.Message.User -> OpenAIClient.Message.User(m.content)
+                            is AnthropicClient.Message.Assistant -> OpenAIClient.Message.Assistant(m.content)
+                        }
+                    }
+                    val openaiReply = openaiClient.complete(openaiHistory, anthropicTools, Prompts.SYSTEM)
+                    AnthropicClient.Reply(
+                        stopReason = openaiReply.stopReason,
+                        assistantContent = openaiReply.assistantContent,
+                        toolUses = openaiReply.toolUses.map {
+                            AnthropicClient.ToolUse(it.id, it.name, it.input)
+                        },
+                        inputTokens = openaiReply.inputTokens,
+                        cachedInputTokens = openaiReply.cachedInputTokens,
+                        cacheCreationInputTokens = openaiReply.cacheCreationInputTokens,
+                        outputTokens = openaiReply.outputTokens
+                    )
+                } else {
+                    val anthropicClient = AnthropicClient(
+                        apiKey = settings.apiKey,
+                        model = settings.model,
+                        baseUrl = settings.baseUrl
+                    )
+                    anthropicClient.complete(history)
+                }
             } catch (t: Throwable) {
                 EventLog.append("agent> API error: ${t.message}")
                 _state.value = State.Error(t.message ?: "API error", step)

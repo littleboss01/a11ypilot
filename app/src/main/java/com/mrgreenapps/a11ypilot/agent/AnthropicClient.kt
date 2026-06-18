@@ -26,11 +26,13 @@ import java.util.concurrent.TimeUnit
 /**
  * Minimal client for Anthropic's /v1/messages tool-use API.
  * Caches the system block + tools so subsequent turns hit the prompt cache.
+ * Supports custom base URLs for third-party Anthropic-compatible endpoints.
  */
 class AnthropicClient(
     private val apiKey: String,
     private val model: String,
-    private val maxOutputTokens: Int = 1024
+    private val maxOutputTokens: Int = 1024,
+    private val baseUrl: String = ""
 ) {
     private val http = OkHttpClient.Builder()
         .connectTimeout(20, TimeUnit.SECONDS)
@@ -106,8 +108,13 @@ class AnthropicClient(
             }
         }
 
+        val endpoint = if (baseUrl.isNotBlank()) {
+            baseUrl.trimEnd('/') + "/v1/messages"
+        } else {
+            "https://api.anthropic.com/v1/messages"
+        }
         val req = Request.Builder()
-            .url("https://api.anthropic.com/v1/messages")
+            .url(endpoint)
             .header("x-api-key", apiKey)
             .header("anthropic-version", "2023-06-01")
             .header("content-type", "application/json")

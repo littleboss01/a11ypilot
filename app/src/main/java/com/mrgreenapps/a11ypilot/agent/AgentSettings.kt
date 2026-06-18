@@ -23,6 +23,8 @@ object AgentSettings {
     private val KEY_MAX_STEPS = intPreferencesKey("max_steps")
     private val KEY_MCP_ENABLED = booleanPreferencesKey("mcp_enabled")
     private val KEY_MCP_PORT = intPreferencesKey("mcp_port")
+    private val KEY_PROVIDER = stringPreferencesKey("provider")
+    private val KEY_BASE_URL = stringPreferencesKey("base_url")
 
     private const val SECRETS_FILE = "agent_secrets"
     private const val SECRET_API_KEY = "anthropic_api_key"
@@ -31,6 +33,8 @@ object AgentSettings {
     const val DEFAULT_MODEL = "claude-sonnet-4-5"
     const val DEFAULT_MAX_STEPS = 25
     const val DEFAULT_MCP_PORT = 8765
+    const val DEFAULT_PROVIDER = "anthropic"
+    const val DEFAULT_BASE_URL = ""
 
     fun model(ctx: Context): Flow<String> =
         ctx.dataStore.data.map { it[KEY_MODEL] ?: DEFAULT_MODEL }
@@ -44,6 +48,12 @@ object AgentSettings {
     fun mcpPort(ctx: Context): Flow<Int> =
         ctx.dataStore.data.map { it[KEY_MCP_PORT] ?: DEFAULT_MCP_PORT }
 
+    fun provider(ctx: Context): Flow<String> =
+        ctx.dataStore.data.map { it[KEY_PROVIDER] ?: DEFAULT_PROVIDER }
+
+    fun baseUrl(ctx: Context): Flow<String> =
+        ctx.dataStore.data.map { it[KEY_BASE_URL] ?: DEFAULT_BASE_URL }
+
     suspend fun setModel(ctx: Context, value: String) =
         ctx.dataStore.edit { it[KEY_MODEL] = value }
 
@@ -56,6 +66,12 @@ object AgentSettings {
     suspend fun setMcpPort(ctx: Context, value: Int) =
         ctx.dataStore.edit { it[KEY_MCP_PORT] = value.coerceIn(1024, 65535) }
 
+    suspend fun setProvider(ctx: Context, value: String) =
+        ctx.dataStore.edit { it[KEY_PROVIDER] = value }
+
+    suspend fun setBaseUrl(ctx: Context, value: String) =
+        ctx.dataStore.edit { it[KEY_BASE_URL] = value }
+
     suspend fun snapshot(ctx: Context): Snapshot {
         val prefs = ctx.dataStore.data.first()
         return Snapshot(
@@ -63,6 +79,8 @@ object AgentSettings {
             maxSteps = prefs[KEY_MAX_STEPS] ?: DEFAULT_MAX_STEPS,
             mcpEnabled = prefs[KEY_MCP_ENABLED] ?: false,
             mcpPort = prefs[KEY_MCP_PORT] ?: DEFAULT_MCP_PORT,
+            provider = prefs[KEY_PROVIDER] ?: DEFAULT_PROVIDER,
+            baseUrl = prefs[KEY_BASE_URL] ?: DEFAULT_BASE_URL,
             apiKey = readSecret(ctx, SECRET_API_KEY),
             mcpToken = readSecret(ctx, SECRET_MCP_TOKEN)
         )
@@ -73,6 +91,8 @@ object AgentSettings {
         val maxSteps: Int,
         val mcpEnabled: Boolean,
         val mcpPort: Int,
+        val provider: String,
+        val baseUrl: String,
         val apiKey: String,
         val mcpToken: String
     )

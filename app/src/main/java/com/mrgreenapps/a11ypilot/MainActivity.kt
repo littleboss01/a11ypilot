@@ -47,6 +47,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -1003,6 +1005,16 @@ private fun SettingsSheet(onDismiss: () -> Unit) {
     var apiKey by remember { mutableStateOf(initialSnapshot?.apiKey.orEmpty()) }
     var model by remember { mutableStateOf(initialSnapshot?.model ?: AgentSettings.DEFAULT_MODEL) }
     var maxSteps by remember { mutableStateOf(initialSnapshot?.maxSteps?.toFloat() ?: AgentSettings.DEFAULT_MAX_STEPS.toFloat()) }
+    var provider by remember { mutableStateOf(initialSnapshot?.provider ?: AgentSettings.DEFAULT_PROVIDER) }
+    var baseUrl by remember { mutableStateOf(initialSnapshot?.baseUrl.orEmpty()) }
+
+    val providerOptions = listOf("anthropic", "anthropic_compat", "openai")
+    val providerLabels = mapOf(
+        "anthropic" to stringResource(R.string.provider_anthropic),
+        "anthropic_compat" to stringResource(R.string.provider_anthropic_compat),
+        "openai" to stringResource(R.string.provider_openai)
+    )
+    var providerExpanded by remember { mutableStateOf(false) }
 
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState) {
         Column(
@@ -1010,6 +1022,38 @@ private fun SettingsSheet(onDismiss: () -> Unit) {
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Text(stringResource(R.string.agent_settings), fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.titleMedium)
+
+            Box {
+                OutlinedTextField(
+                    value = providerLabels[provider] ?: provider,
+                    onValueChange = {},
+                    label = { Text(stringResource(R.string.provider_label)) },
+                    modifier = Modifier.fillMaxWidth(),
+                    readOnly = true,
+                    trailingIcon = {
+                        IconButton(onClick = { providerExpanded = !providerExpanded }) {
+                            Icon(
+                                if (providerExpanded) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                                contentDescription = null
+                            )
+                        }
+                    }
+                )
+                DropdownMenu(
+                    expanded = providerExpanded,
+                    onDismissRequest = { providerExpanded = false }
+                ) {
+                    providerOptions.forEach { option ->
+                        DropdownMenuItem(
+                            text = { Text(providerLabels[option] ?: option) },
+                            onClick = {
+                                provider = option
+                                providerExpanded = false
+                            }
+                        )
+                    }
+                }
+            }
 
             OutlinedTextField(
                 value = apiKey,
@@ -1029,6 +1073,17 @@ private fun SettingsSheet(onDismiss: () -> Unit) {
             )
             Text(stringResource(R.string.model_suggestion), fontSize = 11.sp)
 
+            if (provider != "anthropic") {
+                OutlinedTextField(
+                    value = baseUrl,
+                    onValueChange = { baseUrl = it },
+                    label = { Text(stringResource(R.string.base_url_label)) },
+                    placeholder = { Text(stringResource(R.string.base_url_placeholder)) },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true
+                )
+            }
+
             Text(stringResource(R.string.max_tool_calls, maxSteps.toInt()))
             Slider(
                 value = maxSteps,
@@ -1043,6 +1098,8 @@ private fun SettingsSheet(onDismiss: () -> Unit) {
                     scope.launch {
                         AgentSettings.setModel(context, model.trim().ifEmpty { AgentSettings.DEFAULT_MODEL })
                         AgentSettings.setMaxSteps(context, maxSteps.toInt())
+                        AgentSettings.setProvider(context, provider)
+                        AgentSettings.setBaseUrl(context, baseUrl.trim())
                         onDismiss()
                     }
                 }) { Text(stringResource(R.string.save)) }

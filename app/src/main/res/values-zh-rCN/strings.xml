@@ -130,9 +130,17 @@
 
     <!-- Settings Sheet -->
     <string name="agent_settings">代理设置</string>
-    <string name="api_key_label">Anthropic API 密钥 (sk-ant-\u2026)</string>
+    <string name="provider_label">服务提供商</string>
+    <string name="provider_anthropic">Anthropic（官方）</string>
+    <string name="provider_anthropic_compat">Anthropic（第三方）</string>
+    <string name="provider_openai">OpenAI</string>
+    <string name="api_key_label">API 密钥</string>
+    <string name="api_key_label_anthropic">Anthropic API 密钥 (sk-ant-\u2026)</string>
+    <string name="api_key_label_openai">OpenAI API 密钥 (sk-\u2026)</string>
     <string name="model_id_label">模型 ID</string>
-    <string name="model_suggestion">推荐: claude-sonnet-4-5（默认），claude-haiku-4-5（更快/更便宜）。</string>
+    <string name="model_suggestion">Anthropic: claude-sonnet-4-5（默认）。OpenAI: gpt-4o（默认）。</string>
+    <string name="base_url_label">Base URL</string>
+    <string name="base_url_placeholder">https://api.example.com</string>
     <string name="max_tool_calls">每次运行最大工具调用次数: %1$d</string>
     <string name="save">保存</string>
 
