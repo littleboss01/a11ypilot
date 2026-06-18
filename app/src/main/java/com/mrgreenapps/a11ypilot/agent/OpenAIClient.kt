@@ -201,10 +201,14 @@ class OpenAIClient(
                 throw RuntimeException("OpenAI API ${resp.code}: $text")
             }
             val root = json.parseToJsonElement(text).jsonObject
-            val choices = root["choices"]?.jsonObject?.get("0")?.jsonObject
-                ?: root["choices"]?.let { arr ->
-                    if (arr is kotlinx.serialization.json.JsonArray && arr.isNotEmpty()) arr[0].jsonObject else null
-                }
+            val choicesElement = root["choices"]
+            val choices = when {
+                choicesElement is kotlinx.serialization.json.JsonArray && choicesElement.isNotEmpty() ->
+                    choicesElement[0].jsonObject
+                choicesElement is JsonObject ->
+                    choicesElement
+                else -> null
+            }
             val message = choices?.get("message")?.jsonObject
             val finishReason = choices?.get("finish_reason")?.jsonPrimitive?.contentOrNull ?: "stop"
 
