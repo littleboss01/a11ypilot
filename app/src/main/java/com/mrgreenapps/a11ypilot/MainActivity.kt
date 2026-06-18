@@ -486,16 +486,14 @@ private fun AgentCard(
 
 @Composable
 private fun TryThisCard(enabled: Boolean, onPick: (String) -> Unit) {
-    val examples = remember {
-        listOf(
-            stringResource(R.string.example_1),
-            stringResource(R.string.example_2),
-            stringResource(R.string.example_3),
-            stringResource(R.string.example_4),
-            stringResource(R.string.example_5),
-            stringResource(R.string.example_6)
-        )
-    }
+    val examples = listOf(
+        stringResource(R.string.example_1),
+        stringResource(R.string.example_2),
+        stringResource(R.string.example_3),
+        stringResource(R.string.example_4),
+        stringResource(R.string.example_5),
+        stringResource(R.string.example_6)
+    )
     Card(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(stringResource(R.string.try_this), fontWeight = FontWeight.SemiBold)
