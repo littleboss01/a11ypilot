@@ -143,6 +143,22 @@ class AgentEngine(
         val anthropicTools = Prompts.anthropicTools(mcpTools)
         val isOpenAI = settings.provider == "openai"
 
+        // Create client once before the loop to reuse OkHttpClient
+        val apiClient = if (isOpenAI) {
+            OpenAIClient(
+                apiKey = settings.apiKey,
+                model = settings.model,
+                baseUrl = settings.baseUrl
+            )
+        } else {
+            AnthropicClient(
+                apiKey = settings.apiKey,
+                model = settings.model,
+                baseUrl = settings.baseUrl,
+                systemPrompt = systemPrompt
+            )
+        }
+
         var step = 0
         while (true) {
             if (!scope.isActive || runJob?.isCancelled == true) {
@@ -161,11 +177,7 @@ class AgentEngine(
 
             val reply = try {
                 if (isOpenAI) {
-                    val openaiClient = OpenAIClient(
-                        apiKey = settings.apiKey,
-                        model = settings.model,
-                        baseUrl = settings.baseUrl
-                    )
+                    val openaiClient = apiClient as OpenAIClient
                     val openaiHistory = history.map { m ->
                         when (m) {
                             is AnthropicClient.Message.User -> OpenAIClient.Message.User(m.content)
@@ -185,13 +197,8 @@ class AgentEngine(
                         outputTokens = openaiReply.outputTokens
                     )
                 } else {
-                    val anthropicClient = AnthropicClient(
-                        apiKey = settings.apiKey,
-                        model = settings.model,
-                        baseUrl = settings.baseUrl,
-                        systemPrompt = systemPrompt
-                    )
-                    anthropicClient.complete(history)
+                    val anthropicClient = apiClient as AnthropicClient
+                    anthropicClient.complete(history, anthropicTools)
                 }
             } catch (t: Throwable) {
                 EventLog.append("agent> API error: ${t.message}")
@@ -376,7 +383,10 @@ class AgentEngine(
                     token = obj["token"]?.jsonPrimitive?.content ?: ""
                 )
             }.filter { it.url.isNotBlank() }
-        } catch (_: Throwable) {
+        } catch (t: Throwable) {
+            if (json.isNotBlank() && json != "[]") {
+                EventLog.append("mcp> JSON parse error: ${t.message}")
+            }
             emptyList()
         }
     }

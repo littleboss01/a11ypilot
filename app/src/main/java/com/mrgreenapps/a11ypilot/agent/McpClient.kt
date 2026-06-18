@@ -145,19 +145,6 @@ class McpClient(
         }
     }
 
-    /**
-     * Convert MCP tools to Anthropic tool format for the API.
-     */
-    fun toolsToAnthropicFormat(tools: List<McpTool>, prefix: String = "mcp_"): JsonArray = buildJsonArray {
-        for (tool in tools) {
-            add(buildJsonObject {
-                put("name", prefix + tool.name)
-                put("description", "[MCP] ${tool.description}")
-                put("input_schema", tool.inputSchema)
-            })
-        }
-    }
-
     companion object {
         private val JSON_MEDIA = "application/json; charset=utf-8".toMediaType()
     }

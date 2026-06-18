@@ -65,7 +65,7 @@ class AnthropicClient(
 
     data class ToolUse(val id: String, val name: String, val input: JsonObject)
 
-    suspend fun complete(history: List<Message>): Reply = withContext(Dispatchers.IO) {
+    suspend fun complete(history: List<Message>, tools: JsonArray = Prompts.anthropicTools()): Reply = withContext(Dispatchers.IO) {
         val body = buildJsonObject {
             put("model", model)
             put("max_tokens", maxOutputTokens)
@@ -77,7 +77,6 @@ class AnthropicClient(
                 })
             }
             // Inject cache_control on the final tool so the entire tools block is cacheable.
-            val tools = Prompts.anthropicTools()
             putJsonArray("tools") {
                 tools.forEachIndexed { idx, t ->
                     val obj = t.jsonObject
