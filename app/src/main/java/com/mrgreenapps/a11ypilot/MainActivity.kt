@@ -65,6 +65,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -117,6 +118,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 private fun AppShell(engine: AgentEngine, speech: SpeechInput) {
     var settingsOpen by remember { mutableStateOf(false) }
+    var settingsVersion by remember { mutableIntStateOf(0) }
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
@@ -134,13 +136,14 @@ private fun AppShell(engine: AgentEngine, speech: SpeechInput) {
             engine = engine,
             speech = speech,
             onOpenSettings = { settingsOpen = true },
+            settingsVersion = settingsVersion,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
         )
     }
     if (settingsOpen) {
-        SettingsSheet(onDismiss = { settingsOpen = false })
+        SettingsSheet(onDismiss = { settingsOpen = false; settingsVersion++ })
     }
 }
 
@@ -149,6 +152,7 @@ private fun MainScreen(
     engine: AgentEngine,
     speech: SpeechInput,
     onOpenSettings: () -> Unit,
+    settingsVersion: Int = 0,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -160,7 +164,7 @@ private fun MainScreen(
     val mcpEnabled by AgentSettings.mcpEnabled(context).collectAsState(initial = false)
 
     var instruction by remember { mutableStateOf("") }
-    val apiKeySet = remember(agentState) { AgentSettings.apiKey(context).isNotEmpty() }
+    val apiKeySet = remember(agentState, settingsVersion) { AgentSettings.apiKey(context).isNotEmpty() }
     val canDraw = Settings.canDrawOverlays(context)
 
     val openAccessibility = {
