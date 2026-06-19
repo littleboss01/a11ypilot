@@ -1024,7 +1024,11 @@ private fun SettingsSheet(onDismiss: () -> Unit) {
 
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState) {
         Column(
-            modifier = Modifier.fillMaxWidth().padding(16.dp).padding(bottom = 24.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+                .padding(bottom = 24.dp)
+                .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Text(stringResource(R.string.agent_settings), fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.titleMedium)
