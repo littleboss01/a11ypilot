@@ -82,6 +82,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mrgreenapps.a11ypilot.agent.AgentEngine
+import com.mrgreenapps.a11ypilot.agent.ModelFetcher
 import com.mrgreenapps.a11ypilot.agent.AgentSettings
 import com.mrgreenapps.a11ypilot.agent.NetUtil
 import com.mrgreenapps.a11ypilot.agent.SpeechInput
