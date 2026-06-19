@@ -1022,6 +1022,20 @@ private fun SettingsSheet(onDismiss: () -> Unit) {
     )
     var providerExpanded by remember { mutableStateOf(false) }
 
+    var modelListExpanded by remember { mutableStateOf(false) }
+    var fetchedModels by remember { mutableStateOf<List<String>>(emptyList()) }
+    var modelsLoading by remember { mutableStateOf(false) }
+
+    LaunchedEffect(provider, baseUrl, apiKey) {
+        if (provider != "anthropic" && apiKey.isNotBlank()) {
+            modelsLoading = true
+            fetchedModels = ModelFetcher.fetchModels(baseUrl, apiKey)
+            modelsLoading = false
+        } else {
+            fetchedModels = emptyList()
+        }
+    }
+
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState) {
         Column(
             modifier = Modifier
@@ -1073,15 +1087,47 @@ private fun SettingsSheet(onDismiss: () -> Unit) {
                 singleLine = true
             )
 
-            OutlinedTextField(
-                value = model,
-                onValueChange = { model = it },
-                label = { Text(stringResource(R.string.model_id_label)) },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Ascii)
+            Box {
+                OutlinedTextField(
+                    value = model,
+                    onValueChange = { model = it },
+                    label = { Text(stringResource(R.string.model_id_label)) },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Ascii),
+                    trailingIcon = {
+                        if (fetchedModels.isNotEmpty() || modelsLoading) {
+                            IconButton(onClick = { modelListExpanded = !modelListExpanded }) {
+                                Icon(
+                                    if (modelListExpanded) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                                    contentDescription = null
+                                )
+                            }
+                        }
+                    }
+                )
+                if (fetchedModels.isNotEmpty()) {
+                    DropdownMenu(
+                        expanded = modelListExpanded,
+                        onDismissRequest = { modelListExpanded = false }
+                    ) {
+                        fetchedModels.forEach { m ->
+                            DropdownMenuItem(
+                                text = { Text(m, fontSize = 13.sp) },
+                                onClick = {
+                                    model = m
+                                    modelListExpanded = false
+                                }
+                            )
+                        }
+                    }
+                }
+            }
+            Text(
+                if (modelsLoading) stringResource(R.string.model_fetching)
+                else stringResource(R.string.model_suggestion),
+                fontSize = 11.sp
             )
-            Text(stringResource(R.string.model_suggestion), fontSize = 11.sp)
 
             if (provider != "anthropic") {
                 OutlinedTextField(
